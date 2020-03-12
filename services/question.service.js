@@ -59,3 +59,56 @@ function _delete(_id) {
 
     return deferred.promise;
 }
+
+function update(_id, questionParam) {
+    var deferred = Q.defer();
+
+    // validation
+    db.questions.findById(_id, function (err, q) {
+        if (err) deferred.reject(err.name + ': ' + err.message);
+
+        if ( q.question !== questionParam.username) {
+            // username has changed so check if the new username is already taken
+            db.questions.findOne(
+                { question: questionParam.question },
+                function (err, user) {
+                    if (err) deferred.reject(err.name + ': ' + err.message);
+
+                    if (q) {
+                        // username already exists
+                        deferred.reject('Username "' + req.body.username + '" is already taken')
+                    } else {
+                        updateQuestion();
+                    }
+                });
+        } else {
+            updateQuestion();
+        }
+    });
+
+    function updateQuestion() {
+        // fields to update
+        var set = {
+            question: questionParam.question
+        };
+
+        db.question.update(
+            { _id: mongo.helper.toObjectID(_id) },
+            { $set: set },
+            function (err, doc) {
+                if (err) deferred.reject(err.name + ': ' + err.message);
+
+                deferred.resolve();
+            });
+    }
+
+    return deferred.promise;
+}
+
+function getAll(){
+    db.questons.find({}).toArray(function(err, questions){
+        if(err) deferred.reject(err.name + ': ' + err.message);
+
+        if(questions) return deferred.promise;
+    })
+}

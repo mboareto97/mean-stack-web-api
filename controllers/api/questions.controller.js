@@ -32,3 +32,28 @@ function deleteQuestion(req, res) {
             res.status(400).send(err);
         });
 }
+
+function updateQuestion(req, res) {
+    questionService.update(req.params._id, req.body)
+        .then(function () {
+            res.sendStatus(200);
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
+
+
+function getAll(req, res) {
+    questionService.getAll(req.params._id)
+        .then(function (user) {
+            if (user) {
+                res.send(user);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
